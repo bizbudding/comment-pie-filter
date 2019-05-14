@@ -92,6 +92,9 @@ jQuery( function($) {
 	 *
 	 * Use:
 	 * myArray.filter( makeUnique );
+	 *
+	 * If need some new ways, try this:
+	 * @link  https://gomakethings.com/removing-duplicates-from-an-array-with-vanilla-javascript/
 	 */
 	function makeUnique( value, index, self ) {
 		return self.indexOf(value) === index;
