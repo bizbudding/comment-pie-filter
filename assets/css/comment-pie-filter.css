@@ -1,0 +1,125 @@
+.js-tabcontent[aria-hidden=true] {
+	display: none;
+}
+
+.js-tabs .tabs__list,
+.js-tabs .tabs__item {
+	list-style-type: none;
+}
+
+.js-tabs > .tabs__list {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin-left: 24px;
+	margin-bottom: -1px;
+}
+
+.js-tabs > .tabs__list .tabs__link {
+	display: block;
+	color: rgba(0,0,0,.5);
+	line-height: 1.4;
+	text-decoration: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.js-tabs > .tabs__list .tabs__link:hover {
+	cursor: pointer;
+}
+
+.js-tabs > .tabs__list .tabs__link:focus,
+.js-tabs > .tabs__list .tabs__link:hover,
+.js-tabs > .tabs__list .tabs__link[aria-selected=true] {
+	color: rgba(0,0,0,.8);
+	text-decoration: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.js-tabs > .tabs__list .tabs__item {
+	display: block;
+	margin-bottom: 0;
+}
+
+.js-tabs > .tabs__list .tabs__link:active,
+.js-tabs > .tabs__list .tabs__link[aria-selected=true] {
+	outline: none;
+}
+
+.js-tabs > .tabs__list .tabs__link {
+	padding: 8px 16px 6px;
+	margin-top: 4px;
+	border: 1px solid transparent;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.js-tabs > .tabs__list .tabs__link[aria-selected=false] {
+	margin-left: -1px;
+}
+
+.js-tabs > .tabs__list .tabs__link[aria-selected=true] {
+	border: 1px solid #f0f0f0;
+	border-bottom-color: #fff;
+	border-radius: 2px 2px 0 0;
+}
+
+.js-tabs > .tabs__content {
+	max-width: 100%;
+	padding: 24px;
+	margin-bottom: 24px;
+	border: 1px solid #f0f0f0;
+}
+
+.pf-name-form {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+
+.pf-name-form .choices {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+	margin: 0;
+}
+
+.pf-name-form .choices .choices__input {
+	width: 100% !important;
+}
+
+input[type="submit"].pf-name-submit {
+	margin-left: 12px;
+}
+
+.pf-list,
+.content .pf-list {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+button.pf-remove,
+button.pf-remove:hover,
+button.pf-remove:focus {
+	background: transparent;
+	color: #333;
+	padding: 0;
+	margin: 0;
+}
+
+button.pf-remove svg {
+	color: rgba(0,0,0,.4);
+	margin-bottom: -5px;
+}
+
+button.pf-remove:hover svg,
+button.pf-remove:focus svg {
+	color: red;
+	opacity: 1;
+}
