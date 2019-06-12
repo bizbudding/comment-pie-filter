@@ -68,33 +68,89 @@
 
 .js-tabs > .tabs__content {
 	max-width: 100%;
-	padding: 24px;
 	margin-bottom: 24px;
 	border: 1px solid #f0f0f0;
 }
 
-.pf-name-form {
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
-	align-items: center;
+.pf-no-commenters-message,
+.pf-no-commenters .pf-search,
+.pf-no-commenters .pf-list,
+.pf-no-pied-message,
+.pf-no-pied-commenters .pf-search,
+.pf-no-pied-commenters .pf-list {
+	display: none;
 }
 
-.pf-name-form .choices {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 1 auto;
-	flex: 1 1 auto;
+.pf-no-commenters .pf-no-pied-message,
+.pf-no-pied-commenters .pf-no-pied-message {
+	display: block;
+}
+
+.pf-commenter-list,
+.pf-pied-list,
+.content ul.pf-commenter-list,
+.content ul.pf-pied-list {
+	max-height: 300px;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+}
+
+.pf-list-item,
+.content ul > li.pf-list-item {
 	margin: 0;
 }
 
-.pf-name-form .choices .choices__input {
-	width: 100% !important;
+.pf-button,
+.pf-button:hover,
+.pf-button:focus {
+	width: 100%;
+	background: #fff;
+	color: #323232;
+	font-size: 1rem;
+	line-height: 1;
+	padding: 12px 16px 11px;
 }
 
-input[type="submit"].pf-name-submit {
-	margin-left: 12px;
+.pf-list-item .pf-button {
+	border: 1px solid #f0f0f0;
+}
+
+.pf-list-item:not(:last-child) .pf-button {
+	border-bottom-color: #fff;
+}
+
+.pf-list-item .pf-add:hover,
+.pf-list-item .pf-add:focus,
+.pf-list-item .pf-remove:hover,
+.pf-list-item .pf-remove:focus {
+	background: #f8f8f8;
+	border: 1px solid #d7d7d7;
+}
+
+.pf-list-item .pf-add,
+.pf-list-item .pf-add .action,
+.pf-list-item .pf-remove,
+.pf-list-item .pf-remove .action {
+	-webkit-transition: all 0.3s ease-in-out;
+	-o-transition: all 0.3s ease-in-out;
+	transition: all 0.3s ease-in-out;
+}
+
+.pf-list-item .pf-add .action,
+.pf-list-item .pf-remove .action {
+	color: rgba(0,0,0,.3);
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.pf-list-item .pf-add:hover .action,
+.pf-list-item .pf-add:focus .action,
+.pf-list-item .pf-remove:hover .action,
+.pf-list-item .pf-remove:focus .action {
+	color: #515151;
 }
 
 .pf-list,
@@ -104,22 +160,55 @@ input[type="submit"].pf-name-submit {
 	margin: 0;
 }
 
+/* .pf-list li:last-child,
+.content .pf-list li:last-child {
+	margin-bottom: 0;
+}
+
 button.pf-remove,
 button.pf-remove:hover,
 button.pf-remove:focus {
 	background: transparent;
-	color: #333;
 	padding: 0;
 	margin: 0;
 }
 
+button.pf-remove,
 button.pf-remove svg {
-	color: rgba(0,0,0,.4);
-	margin-bottom: -5px;
+	-webkit-transition: all 0.3s ease-in-out;
+	-o-transition: all 0.3s ease-in-out;
+	transition: all 0.3s ease-in-out;
 }
 
+button.pf-remove {
+	color: #333;
+}
+
+button.pf-remove svg {
+	color: rgba(0,0,0,.4);
+	margin-bottom: -6px;
+}
+
+button.pf-remove:hover,
+button.pf-remove:focus,
 button.pf-remove:hover svg,
 button.pf-remove:focus svg {
 	color: red;
 	opacity: 1;
+} */
+
+@media only screen and (max-width: 768px) {
+
+	.js-tabs > .tabs__content {
+		padding: 24px;
+	}
+
+}
+
+@media only screen and (min-width: 769px) {
+
+	.js-tabs > .tabs__content {
+		padding: 36px;
+	}
+
 }

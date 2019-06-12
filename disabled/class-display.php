@@ -26,7 +26,7 @@ class Comment_Pie_Filter_Display {
 		// wp_enqueue_style( 'selectize', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/selectize.css', array(), '0.12.4' );
 		// wp_enqueue_style( 'selectize-default', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/selectize.default.css', array(), '0.12.4' );
 		// wp_enqueue_script( 'selectize', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/selectize.min.js', array( 'jquery' ), '0.12.4', true );
-		wp_enqueue_script( 'list-js', '//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.js', array( 'jquery' ), '1.5.0', true );
+		wp_enqueue_script( 'list-js', '//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js', array( 'jquery' ), '1.5.0', true );
 		wp_enqueue_script( 'localforage', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/localforage.js', array( 'jquery' ), '1.7.3', true );
 		wp_enqueue_script( 'jquery-accessible-tabs', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/jquery-accessible-tabs.js', array( 'jquery' ), COMMENT_PIE_FILTER_VERSION, true );
 		wp_enqueue_script( 'comment-pie-filter', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/comment-pie-filter.js', array( 'localforage' ), COMMENT_PIE_FILTER_VERSION, true );
@@ -41,63 +41,46 @@ class Comment_Pie_Filter_Display {
 		<div class="pie-filter js-tabs" data-tabs-disable-fragment="1">
 			<ul class="js-tablist">
 				<li class="js-tablist__item">
-					<a href="#pf-commenter-content" class="js-tablist__link">Pie Filter</a>
+					<a href="#pf-form-content" class="js-tablist__link">Pie Filter</a>
 				</li>
 				<li class="js-tablist__item">
-					<a href="#pf-pied-content" class="js-tablist__link">Pied List</a>
+					<a href="#pf-list-content" class="js-tablist__link">Pied List</a>
 				</li>
 				<li class="js-tablist__item">
 					<a href="#pf-settings-content" class="js-tablist__link">Settings</a>
 				</li>
 			</ul>
-			<?php
-			$commenters = $this->get_commenters();
-			$class      = $commenters ? '' : ' pf-no-commenters';
-			printf( '<div id="pf-commenter-content" class="js-tabcontent%s">', $class );
-				?>
-				<h3>Commenters</h3>
-				<input class="pf-commenter-search pf-search search bottom-xs-xxs" placeholder="Search commenters..." />
-				<ul class="list pf-list pf-commenter-list">
-					<?php
-					if ( $commenters ) {
-						foreach( $commenters as $commenter ) {
-							?>
-							<li class="pf-list-item pf-commenter-item">
-								<button class="pf-button pf-add row middle-xs">
-									<?php printf( '<span class="pf-commenter col col-xs text-xs-left">%s</span>', $commenter ); ?>
-									<span class="action col-xs-auto">Click to Add</span>
-								</button>
-							</li>
-							<?php
-						}
-					} else {
-						?>
-						<li class="pf-list-item pf-commenter-item">
-							<button class="pf-button pf-add row middle-xs">
-								<span class="pf-commenter col col-xs text-xs-left"></span>
-								<span class="action col-xs-auto">Click to Add</span>
-							</button>
-						</li>
-						<?php
-					}
-					?>
-				</ul>
+			<div id="pf-form-content" class="js-tabcontent">
+				<form class="pf-name-form" method="post">
+					<div class="row gutter-xs middle-xs">
+						<div class="col col-xs-12 col-sm-8 bottom-xs-xs bottom-sm-none">
+							<select class="pf-name" name="pf-name" required>
+								<?php
+								$commenters = $this->get_commenters();
+								if ( $commenters ) {
+									echo '<option placeholder>Select a commenter...</option>';
+									foreach( $commenters as $commenter ) {
+										printf( '<option value="%1$s">%1$s</option>', $commenter );
+									}
+								} else {
+									echo '<option placeholder>This post does not have comments yet...</option>';
+								}
+								?>
+							</select>
+						</div>
+						<div class="col col-xs-12 col-sm-auto">
+							<!-- <input class="pf-name-submit" type="submit" value="Add To List" disabled> -->
+							<input class="pf-name-submit" type="submit" value="Add To List">
+						</div>
+					</div>
+				</form>
 			</div>
-			<div id="pf-pied-content" class="js-tabcontent">
-				<h3>Pied Commenters</h3>
-				<p class="pf-no-pied-message">You do not have any commenters filtered at this time.</p>
-				<input class="pf-pied-search pf-search search bottom-xs-xxs" placeholder="Search pied commenters..." />
-				<ul class="list pf-list pf-pied-list">
-					<li class="pf-list-item pf-pied-item">
-						<button class="pf-button pf-remove row middle-xs">
-							<span class="pf-commenter col col-xs text-xs-left"></span>
-							<span class="action col-xs-auto">Click to Remove</span>
-						</button>
-					</li>
+			<div id="pf-list-content" class="js-tabcontent">
+				<ul class="pf-list">
+					<li>You do not have any commenters filtered at this time.</li>
 				</ul>
 			</div>
 			<div id="pf-settings-content" class="js-tabcontent">
-				<h3>Pie Settings</h3>
 				<form class="pf-settings-form" method="post">
 					<select name="pf-settings" required>
 						<option value="" placeholder>Select a commenter...</option>
@@ -134,15 +117,14 @@ class Comment_Pie_Filter_Display {
 			return false;
 		}
 		// Get authors as array.
-		$commenters = wp_list_pluck( $comments, 'comment_author' );
-		// Remove duplicates.
-		$commenters = array_unique( $commenters );
-		// Bail if no commenters.
-		if ( ! $commenters ) {
+		$comments = wp_list_pluck( $comments, 'comment_author' );
+		$comments = array_unique( $comments );
+		// Bail if no comments.
+		if ( ! $comments ) {
 			return false;
 		}
 		// Got em.
-		return $commenters;
+		return $comments;
 	}
 
 }
