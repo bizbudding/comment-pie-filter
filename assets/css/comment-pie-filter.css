@@ -72,17 +72,29 @@
 	border: 1px solid #f0f0f0;
 }
 
+@media only screen and (max-width: 768px) {
+
+	.js-tabs > .tabs__content {
+		padding: 24px;
+	}
+
+}
+
+@media only screen and (min-width: 769px) {
+
+	.js-tabs > .tabs__content {
+		padding: 36px;
+	}
+
+}
+
 .pf-no-commenters-message,
 .pf-no-commenters .pf-search,
-.pf-no-commenters .pf-list,
-.pf-no-pied-message,
-.pf-no-pied-commenters .pf-search,
-.pf-no-pied-commenters .pf-list {
+.pf-no-commenters .pf-list {
 	display: none;
 }
 
-.pf-no-commenters .pf-no-pied-message,
-.pf-no-pied-commenters .pf-no-pied-message {
+.pf-no-commenters .pf-no-commenters-message {
 	display: block;
 }
 
@@ -160,55 +172,68 @@
 	margin: 0;
 }
 
-/* .pf-list li:last-child,
-.content .pf-list li:last-child {
-	margin-bottom: 0;
+
+.comment.pf-hidden {
+	position: relative;
 }
 
-button.pf-remove,
-button.pf-remove:hover,
-button.pf-remove:focus {
-	background: transparent;
+.comment.pf-hidden:not(.pf-hidden-visible) .pf-comment-inner {
+	-webkit-filter: blur(4px);
+	filter: blur(4px);
+}
+
+.pf-overlay {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+
+.pf-overlay .pf-comment-toggle {
+	/* position: absolute;
+	bottom: 24px;
+	right: 24px; */
+}
+
+.pf-comment-toggle {
+	position: absolute;
+	bottom: 24px;
+	right: 24px;
+}
+
+
+.pf-comment-toggle,
+.pf-comment-toggle:hover,
+.pf-comment-toggle:focus {
+	/* background: transparent;
+	color: #323232;
 	padding: 0;
-	margin: 0;
+	margin: 0; */
 }
 
-button.pf-remove,
-button.pf-remove svg {
-	-webkit-transition: all 0.3s ease-in-out;
-	-o-transition: all 0.3s ease-in-out;
-	transition: all 0.3s ease-in-out;
+.pf-comment-toggle {
+	/* opacity: .8; */
 }
 
-button.pf-remove {
-	color: #333;
+.pf-comment-toggle:hover,
+.pf-comment-toggle:focus {
+	/* opacity: 1; */
 }
 
-button.pf-remove svg {
-	color: rgba(0,0,0,.4);
-	margin-bottom: -6px;
-}
-
-button.pf-remove:hover,
-button.pf-remove:focus,
-button.pf-remove:hover svg,
-button.pf-remove:focus svg {
-	color: red;
-	opacity: 1;
-} */
-
-@media only screen and (max-width: 768px) {
-
-	.js-tabs > .tabs__content {
-		padding: 24px;
-	}
-
-}
-
-@media only screen and (min-width: 769px) {
-
-	.js-tabs > .tabs__content {
-		padding: 36px;
-	}
-
+.pf-comment-toggle svg {
+	/* margin-bottom: -8px; */
 }

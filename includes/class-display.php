@@ -13,7 +13,8 @@ class Comment_Pie_Filter_Display {
 		add_action( 'wp_enqueue_scripts',               array( $this, 'enqueue' ) );
 		add_action( 'genesis_before_comments',          array( $this, 'add_pie_filter' ) );
 		add_action( 'genesis_before_comment',           array( $this, 'comment_number' ) );
-		add_filter( 'genesis_attr_comment-author-name', array( $this, 'comment_attributes' ) );
+		add_filter( 'genesis_attr_comment',             array( $this, 'comment_attributes' ) );
+		// add_filter( 'genesis_attr_comment-author-name', array( $this, 'comment_author_attributes' ) );
 	}
 
 	function enqueue() {
@@ -56,6 +57,7 @@ class Comment_Pie_Filter_Display {
 			printf( '<div id="pf-commenter-content" class="js-tabcontent%s">', $class );
 				?>
 				<h3>Commenters</h3>
+				<p class="pf-no-commenters-message bottom-xs-none">No commenters available.</p>
 				<input class="pf-commenter-search pf-search search bottom-xs-xxs" placeholder="Search commenters..." />
 				<ul class="list pf-list pf-commenter-list">
 					<?php
@@ -85,7 +87,7 @@ class Comment_Pie_Filter_Display {
 			</div>
 			<div id="pf-pied-content" class="js-tabcontent">
 				<h3>Pied Commenters</h3>
-				<p class="pf-no-pied-message">You do not have any commenters filtered at this time.</p>
+				<p class="pf-no-commenters-message bottom-xs-none">No filtered commenters available.</p>
 				<input class="pf-pied-search pf-search search bottom-xs-xxs" placeholder="Search pied commenters..." />
 				<ul class="list pf-list pf-pied-list">
 					<li class="pf-list-item pf-pied-item">
@@ -115,6 +117,18 @@ class Comment_Pie_Filter_Display {
 	}
 
 	function comment_attributes( $attributes ) {
+		$comment_id = get_comment_ID();
+		$comment    = get_comment( $comment_id );
+		if ( $comment ) {
+			$attributes['class']       = trim( $attributes['class'] . ' pf-comment-inner' );
+ 			$attributes['data-id']     = esc_html( $comment->comment_ID );
+ 			$attributes['data-name']   = esc_html( $comment->comment_author );
+			$attributes['data-parent'] = $comment->comment_parent ? absint( $comment->comment_parent ) : '00'; // genesis_attr() won't display if it's just 0.
+		}
+		return $attributes;
+	}
+
+	function comment_author_attributes( $attributes ) {
 		$comment_id = get_comment_ID();
 		$comment    = get_comment( $comment_id );
 		if ( $comment ) {
