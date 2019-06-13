@@ -6,11 +6,40 @@ jQuery( function($) {
 		return;
 	}
 
+	var displaySetting    = '';
 	var piedCommenters    = [];
 	var $commenterContent = $( '#pf-commenter-content' );
 	var $piedContent      = $( '#pf-pied-content' );
+	var $settingsField    = $( '#pf-settings' );
 	var commentUpIcon     = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 40" x="0px" y="0px" height="2em" width="2em" fill="currentColor"><title>comment-up</title><g data-name="comment-up"><path d="M28,3H4A2,2,0,0,0,2,5V23a2,2,0,0,0,2,2H6v3a1,1,0,0,0,.57.9A.91.91,0,0,0,7,29a1,1,0,0,0,.62-.22L12.35,25H28a2,2,0,0,0,2-2V5A2,2,0,0,0,28,3Zm0,20H12a1,1,0,0,0-.62.22L8,25.92V24a1,1,0,0,0-1-1H4V5H28Z"/><path d="M12.71,14.71,15,12.41V18a1,1,0,0,0,2,0V12.41l2.29,2.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42l-4-4a1,1,0,0,0-.33-.21,1,1,0,0,0-.76,0,1,1,0,0,0-.33.21l-4,4a1,1,0,0,0,1.42,1.42Z"/></g></svg>';
 	var commentDownIcon   = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 40" x="0px" y="0px" height="2em" width="2em" fill="currentColor"><title>comment-down</title><g data-name="comment-down"><path d="M28,3H4A2,2,0,0,0,2,5V23a2,2,0,0,0,2,2H6v3a1,1,0,0,0,.57.9A.91.91,0,0,0,7,29a1,1,0,0,0,.62-.22L12.35,25H28a2,2,0,0,0,2-2V5A2,2,0,0,0,28,3Zm0,20H12a1,1,0,0,0-.62.22L8,25.92V24a1,1,0,0,0-1-1H4V5H28Z"/><path d="M15.29,18.71a1,1,0,0,0,.33.21.94.94,0,0,0,.76,0,1,1,0,0,0,.33-.21l4-4a1,1,0,0,0-1.42-1.42L17,15.59V10a1,1,0,0,0-2,0v5.59l-2.29-2.3a1,1,0,0,0-1.42,1.42Z"/></g></svg>';
+
+	localforage.getItem( 'commentFilterDisplay' ).then( function( value ) {
+		if ( ! value ) {
+			displaySetting = $settingsField.val();
+			// Save setting in local storage.
+			localforage.setItem( 'commentFilterDisplay', displaySetting );
+		} else {
+			displaySetting = value;
+			$settingsField.val( displaySetting );
+		}
+	});
+
+	// Update setting on change.
+	$settingsField.on( 'change', function(e) {
+		// Save setting variable.
+		displaySetting = $(this).val();
+		// Save setting in local storage.
+		localforage.setItem( 'commentFilterDisplay', displaySetting );
+		// Update content.
+		var $overlay = $( '.pf-overlay' );
+		// Bail if no overlays.
+		if ( ! $overlay.length ) {
+			return;
+		}
+		// Add the overlay content.
+		doOverlayContent( $overlay );
+	});
 
 	// Loop through piedCommenters.
 	localforage.getItem( 'piedCommenters' ).then( function( value ) {
@@ -158,8 +187,12 @@ jQuery( function($) {
 
 		function hideComment( $comment ) {
 			$comment.parents( '.comment' ).addClass( 'pf-hidden' );
-			// TODO: Get setting here and find overlay content.
-			$comment.after( '<button class="button alt small pf-comment-toggle">Toggle Comment</button>' ).after( '<span class="pf-overlay"></span>' );
+			$comment.after( '<button class="comment-reply-link pf-comment-toggle">Toggle</button>' ).after( '<span class="pf-overlay"></span>' );
+			var $overlay = $comment.siblings( '.pf-overlay' );
+			if ( ! $overlay.length ) {
+				return;
+			}
+			doOverlayContent( $overlay );
 		}
 
 		function showComments( commenter ) {
@@ -252,6 +285,22 @@ jQuery( function($) {
 			}
 		}
 	});
+
+	// TODO: THIS IS NOT RANDOM!?!?.
+	function doOverlayContent( $overlay ) {
+		$.each( $overlay, function( index, value ) {
+			var content = '';
+			switch( displaySetting ) {
+				case 'image':
+					content = commentFilterVars.images[ Math.floor( Math.random() * commentFilterVars.images.length ) ];
+				break;
+					case 'quote':
+					content = commentFilterVars.quotes[ Math.floor( Math.random() * commentFilterVars.quotes.length ) ];
+				break;
+			}
+			$overlay.html( content );
+		});
+	}
 
 	function getEscaped( string ) {
 		var div = document.createElement( 'div' );

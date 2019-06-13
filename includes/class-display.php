@@ -10,31 +10,52 @@ class Comment_Pie_Filter_Display {
 	}
 
 	function hooks() {
-		add_action( 'wp_enqueue_scripts',               array( $this, 'enqueue' ) );
-		add_action( 'genesis_before_comments',          array( $this, 'add_pie_filter' ) );
-		add_action( 'genesis_before_comment',           array( $this, 'comment_number' ) );
-		add_filter( 'genesis_attr_comment',             array( $this, 'comment_attributes' ) );
-		// add_filter( 'genesis_attr_comment-author-name', array( $this, 'comment_author_attributes' ) );
+		add_action( 'wp_enqueue_scripts',      array( $this, 'enqueue' ) );
+		add_action( 'genesis_before_comments', array( $this, 'add_pie_filter' ) );
+		add_action( 'genesis_before_comment',  array( $this, 'comment_number' ) );
+		add_filter( 'genesis_attr_comment',    array( $this, 'comment_attributes' ) );
 	}
 
 	function enqueue() {
 		wp_enqueue_style( 'comment-pie-filter', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/comment-pie-filter.css', array(), COMMENT_PIE_FILTER_VERSION );
-		// wp_enqueue_style( 'chosen', COMMENT_PIE_FILTER_PLUGIN_URL . 'vendor/harvesthq/chosen/chosen.min.css', array(), '1.8.7' );
-		// wp_enqueue_script( 'chosen', COMMENT_PIE_FILTER_PLUGIN_URL . 'vendor/harvesthq/chosen/chosen.jquery.min.js', array( 'jquery' ), '1.8.7', true );
-		// wp_enqueue_style( 'choices-base', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/choices-base.min.css', array(), '7.0.0' );
-		// wp_enqueue_style( 'choices', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/choices.min.css', array(), '7.0.0' );
-		// wp_enqueue_script( 'choices', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/choices.min.js', array( 'jquery' ), '7.0.0', true );
-		// wp_enqueue_style( 'selectize', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/selectize.css', array(), '0.12.4' );
-		// wp_enqueue_style( 'selectize-default', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/selectize.default.css', array(), '0.12.4' );
-		// wp_enqueue_script( 'selectize', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/selectize.min.js', array( 'jquery' ), '0.12.4', true );
 		wp_enqueue_script( 'list-js', '//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.js', array( 'jquery' ), '1.5.0', true );
 		wp_enqueue_script( 'localforage', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/localforage.js', array( 'jquery' ), '1.7.3', true );
 		wp_enqueue_script( 'jquery-accessible-tabs', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/jquery-accessible-tabs.js', array( 'jquery' ), COMMENT_PIE_FILTER_VERSION, true );
 		wp_enqueue_script( 'comment-pie-filter', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/comment-pie-filter.js', array( 'localforage' ), COMMENT_PIE_FILTER_VERSION, true );
-		// wp_localize_script( 'script-name', 'prefix_script_vars', array(
-		// 	'search_btn' => inforelay_get_search_btn(),
-		// 	'search_box' => inforelay_get_search_box(),
-		// ) );
+		wp_localize_script( 'comment-pie-filter', 'commentFilterVars', array(
+			'images' => $this->get_images(),
+			'quotes' => $this->get_quotes(),
+		) );
+	}
+
+	function get_images() {
+		$images = array();
+		if ( ! function_exists( 'get_field' ) ) {
+			return $images;
+		}
+		$data = get_field( 'comment_filter_images', 'option' );
+		if ( ! $data ) {
+			return;
+		}
+		foreach( $data as $image_id ) {
+			$images[] = wp_get_attachment_image( $image_id, 'tiny' );
+		}
+		return $images;
+	}
+
+	function get_quotes() {
+		$quotes = array();
+		if ( ! function_exists( 'get_field' ) ) {
+			return $quotes;
+		}
+		$data = get_field( 'comment_filter_quotes', 'option' );
+		if ( ! $data ) {
+			return;
+		}
+		$data   = trim( $data );
+		$quotes = explode( "\n", $data );
+		$quotes = array_map( 'trim', $quotes );
+		return $quotes;
 	}
 
 	function add_pie_filter() {
@@ -101,10 +122,11 @@ class Comment_Pie_Filter_Display {
 			<div id="pf-settings-content" class="js-tabcontent">
 				<h3>Pie Settings</h3>
 				<form class="pf-settings-form" method="post">
-					<select name="pf-settings" required>
-						<option value="" placeholder>Select a commenter...</option>
+					<select id="pf-settings" name="pf-settings" required>
+						<option value="default">Blur comment</option>
+						<option value="image">Show a random image</option>
+						<option value="quote">Show a random quote</option>
 					</select>
-					<input class="pf-settings-submit" type="submit" value="Submit">
 				</form>
 			</div>
 		</div>

@@ -1,6 +1,5 @@
 {
     "require": {
-        "yahnis-elsts/plugin-update-checker": "^4.6",
-        "harvesthq/chosen": "^1.8"
+        "yahnis-elsts/plugin-update-checker": "^4.6"
     }
 }
