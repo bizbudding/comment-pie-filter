@@ -6,6 +6,12 @@ jQuery( function($) {
 		return;
 	}
 
+	// Bail if no comments.
+	var $commentsWrap = $( '#comments' );
+	if ( ! $commentsWrap.length ) {
+		return;
+	}
+
 	var displaySetting    = '';
 	var piedCommenters    = [];
 	var $commenterContent = $( '#pf-commenter-content' );
