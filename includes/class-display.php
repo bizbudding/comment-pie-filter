@@ -1,6 +1,6 @@
 <?php
 
-class Comment_Pie_Filter_Display {
+class Mai_Comment_Filter_Display {
 
 	protected $count;
 
@@ -17,15 +17,28 @@ class Comment_Pie_Filter_Display {
 	}
 
 	function enqueue() {
-		wp_enqueue_style( 'comment-pie-filter', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/css/comment-pie-filter.css', array(), COMMENT_PIE_FILTER_VERSION );
-		wp_enqueue_script( 'list-js', '//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.js', array( 'jquery' ), '1.5.0', true );
-		wp_enqueue_script( 'localforage', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/localforage.js', array( 'jquery' ), '1.7.3', true );
-		wp_enqueue_script( 'jquery-accessible-tabs', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/jquery-accessible-tabs.js', array( 'jquery' ), COMMENT_PIE_FILTER_VERSION, true );
-		wp_enqueue_script( 'comment-pie-filter', COMMENT_PIE_FILTER_PLUGIN_URL . 'assets/js/comment-pie-filter.js', array( 'localforage' ), COMMENT_PIE_FILTER_VERSION, true );
-		wp_localize_script( 'comment-pie-filter', 'commentFilterVars', array(
+		$suffix = $this->get_suffix();
+		wp_enqueue_style( 'mai-comment-filter',      MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/css/mai-comment-filter{$suffix}.css", array(), MAI_COMMENT_PIE_FILTER_VERSION );
+		wp_enqueue_script( 'list-js',                MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/list{$suffix}.js", array( 'jquery' ), '1.5.0', true );
+		wp_enqueue_script( 'localforage',            MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/localforage{$suffix}.js", array( 'jquery' ), '1.7.3', true );
+		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs{$suffix}.js", array( 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
+		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'localforage' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
+		wp_localize_script( 'mai-comment-filter', 'commentFilterVars', array(
 			'images' => $this->get_images(),
 			'quotes' => $this->get_quotes(),
 		) );
+	}
+
+	/**
+	 * Helper function for getting the script/style `.min` suffix for minified files.
+	 *
+	 * @since   0.8.0
+	 *
+	 * @return  string
+	 */
+	function get_suffix() {
+		$debug = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+		return $debug ? '' : '.min';
 	}
 
 	function get_images() {
@@ -38,8 +51,11 @@ class Comment_Pie_Filter_Display {
 			return;
 		}
 		foreach( $data as $image_id ) {
-			$images[] = wp_get_attachment_image( $image_id, 'tiny' );
+			$images[] = wp_get_attachment_image( $image_id, 'thumbnail' );
 		}
+		$images = array_filter( $images );
+		$images = array_unique( $images );
+		shuffle( $images );
 		return $images;
 	}
 
@@ -55,6 +71,9 @@ class Comment_Pie_Filter_Display {
 		$data   = trim( $data );
 		$quotes = explode( "\n", $data );
 		$quotes = array_map( 'trim', $quotes );
+		$quotes = array_filter( $quotes );
+		$quotes = array_unique( $quotes );
+		shuffle( $quotes );
 		return $quotes;
 	}
 
@@ -63,31 +82,31 @@ class Comment_Pie_Filter_Display {
 		<div class="pie-filter js-tabs" data-tabs-disable-fragment="1">
 			<ul class="js-tablist">
 				<li class="js-tablist__item">
-					<a href="#pf-commenter-content" class="js-tablist__link">Pie Filter</a>
+					<a href="#cf-commenter-content" class="js-tablist__link">Pie Filter</a>
 				</li>
 				<li class="js-tablist__item">
-					<a href="#pf-pied-content" class="js-tablist__link">Pied List</a>
+					<a href="#cf-pied-content" class="js-tablist__link">Pied List</a>
 				</li>
 				<li class="js-tablist__item">
-					<a href="#pf-settings-content" class="js-tablist__link">Settings</a>
+					<a href="#cf-settings-content" class="js-tablist__link">Settings</a>
 				</li>
 			</ul>
 			<?php
 			$commenters = $this->get_commenters();
-			$class      = $commenters ? '' : ' pf-no-commenters';
-			printf( '<div id="pf-commenter-content" class="js-tabcontent%s">', $class );
+			$class      = $commenters ? '' : ' cf-no-commenters';
+			printf( '<div id="cf-commenter-content" class="js-tabcontent%s">', $class );
 				?>
 				<h3>Commenters</h3>
-				<p class="pf-no-commenters-message bottom-xs-none">No commenters available.</p>
-				<input class="pf-commenter-search pf-search search bottom-xs-xxs" placeholder="Search commenters..." />
-				<ul class="list pf-list pf-commenter-list">
+				<p class="cf-no-commenters-message bottom-xs-none">No commenters available.</p>
+				<input class="cf-commenter-search cf-search search bottom-xs-xxs" placeholder="Search commenters..." />
+				<ul class="list cf-list cf-commenter-list">
 					<?php
 					if ( $commenters ) {
 						foreach( $commenters as $commenter ) {
 							?>
-							<li class="pf-list-item pf-commenter-item">
-								<button class="pf-button pf-add row middle-xs">
-									<?php printf( '<span class="pf-commenter col col-xs text-xs-left">%s</span>', $commenter ); ?>
+							<li class="cf-list-item cf-commenter-item">
+								<button class="cf-button cf-add row middle-xs">
+									<?php printf( '<span class="cf-commenter col col-xs text-xs-left">%s</span>', $commenter ); ?>
 									<span class="action col-xs-auto">Click to Add</span>
 								</button>
 							</li>
@@ -95,9 +114,9 @@ class Comment_Pie_Filter_Display {
 						}
 					} else {
 						?>
-						<li class="pf-list-item pf-commenter-item">
-							<button class="pf-button pf-add row middle-xs">
-								<span class="pf-commenter col col-xs text-xs-left"></span>
+						<li class="cf-list-item cf-commenter-item">
+							<button class="cf-button cf-add row middle-xs">
+								<span class="cf-commenter col col-xs text-xs-left"></span>
 								<span class="action col-xs-auto">Click to Add</span>
 							</button>
 						</li>
@@ -106,27 +125,25 @@ class Comment_Pie_Filter_Display {
 					?>
 				</ul>
 			</div>
-			<div id="pf-pied-content" class="js-tabcontent">
+			<div id="cf-pied-content" class="js-tabcontent">
 				<h3>Pied Commenters</h3>
-				<p class="pf-no-commenters-message bottom-xs-none">No filtered commenters available.</p>
-				<input class="pf-pied-search pf-search search bottom-xs-xxs" placeholder="Search pied commenters..." />
-				<ul class="list pf-list pf-pied-list">
-					<li class="pf-list-item pf-pied-item">
-						<button class="pf-button pf-remove row middle-xs">
-							<span class="pf-commenter col col-xs text-xs-left"></span>
+				<p class="cf-no-commenters-message bottom-xs-none">No filtered commenters available.</p>
+				<input class="cf-pied-search cf-search search bottom-xs-xxs" placeholder="Search pied commenters..." />
+				<ul class="list cf-list cf-pied-list">
+					<li class="cf-list-item cf-pied-item">
+						<button class="cf-button cf-remove row middle-xs">
+							<span class="cf-commenter col col-xs text-xs-left"></span>
 							<span class="action col-xs-auto">Click to Remove</span>
 						</button>
 					</li>
 				</ul>
 			</div>
-			<div id="pf-settings-content" class="js-tabcontent">
+			<div id="cf-settings-content" class="js-tabcontent">
 				<h3>Pie Settings</h3>
-				<form class="pf-settings-form" method="post">
-					<select id="pf-settings" name="pf-settings" required>
-						<option value="default">Blur comment</option>
-						<option value="image">Show a random image</option>
-						<option value="quote">Show a random quote</option>
-					</select>
+				<form id="cf-settings-form" class="cf-settings-form" method="post">
+					<label><input type="radio" name="cf-display" value="default" checked> Hide Comment</label><br>
+					<label><input type="radio" name="cf-display" value="image"> Show a random image</label><br>
+					<label><input type="radio" name="cf-display" value="quote"> Show a random quote</label>
 				</form>
 			</div>
 		</div>
@@ -142,7 +159,7 @@ class Comment_Pie_Filter_Display {
 		$comment_id = get_comment_ID();
 		$comment    = get_comment( $comment_id );
 		if ( $comment ) {
-			$attributes['class']       = trim( $attributes['class'] . ' pf-comment-inner' );
+			$attributes['class']       = trim( $attributes['class'] . ' cf-comment-inner' );
  			$attributes['data-id']     = esc_html( $comment->comment_ID );
  			$attributes['data-name']   = esc_html( $comment->comment_author );
 			$attributes['data-parent'] = $comment->comment_parent ? absint( $comment->comment_parent ) : '00'; // genesis_attr() won't display if it's just 0.
@@ -184,5 +201,5 @@ class Comment_Pie_Filter_Display {
 }
 
 add_action( 'genesis_setup', function() {
-	new Comment_Pie_Filter_Display;
+	new Mai_Comment_Filter_Display;
 });
