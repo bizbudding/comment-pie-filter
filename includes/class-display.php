@@ -5,25 +5,23 @@ class Mai_Comment_Filter_Display {
 	protected $count;
 
 	function __construct() {
-		$this->count = 1;
 		$this->hooks();
 	}
 
 	function hooks() {
 		add_action( 'wp_enqueue_scripts',      array( $this, 'enqueue' ) );
 		add_action( 'genesis_before_comments', array( $this, 'add_pie_filter' ) );
-		add_action( 'genesis_before_comment',  array( $this, 'comment_number' ) );
 		add_filter( 'genesis_attr_comment',    array( $this, 'comment_attributes' ) );
 	}
 
 	function enqueue() {
 		$suffix = $this->get_suffix();
 		wp_enqueue_style( 'mai-comment-filter',      MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/css/mai-comment-filter{$suffix}.css", array(), MAI_COMMENT_PIE_FILTER_VERSION );
+		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs{$suffix}.js", array( 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
 		wp_enqueue_script( 'list-js',                MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/list{$suffix}.js", array( 'jquery' ), '1.5.0', true );
 		wp_enqueue_script( 'localforage',            MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/localforage{$suffix}.js", array( 'jquery' ), '1.7.3', true );
-		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs{$suffix}.js", array( 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
-		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'localforage' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
-		wp_localize_script( 'mai-comment-filter', 'commentFilterVars', array(
+		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'localforage', 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
+		wp_localize_script( 'mai-comment-filter',    'commentFilterVars', array(
 			'images' => $this->get_images(),
 			'quotes' => $this->get_quotes(),
 		) );
@@ -82,10 +80,10 @@ class Mai_Comment_Filter_Display {
 		<div class="pie-filter js-tabs" data-tabs-disable-fragment="1">
 			<ul class="js-tablist">
 				<li class="js-tablist__item">
-					<a href="#cf-commenter-content" class="js-tablist__link">Pie Filter</a>
+					<a href="#cf-commenter-content" class="js-tablist__link">Commenters</a>
 				</li>
 				<li class="js-tablist__item">
-					<a href="#cf-pied-content" class="js-tablist__link">Pied List</a>
+					<a href="#cf-filtered-content" class="js-tablist__link">Filtered</a>
 				</li>
 				<li class="js-tablist__item">
 					<a href="#cf-settings-content" class="js-tablist__link">Settings</a>
@@ -125,10 +123,10 @@ class Mai_Comment_Filter_Display {
 					?>
 				</ul>
 			</div>
-			<div id="cf-pied-content" class="js-tabcontent">
-				<h3>Pied Commenters</h3>
+			<div id="cf-filtered-content" class="js-tabcontent">
+				<h3>Filtered Commenters</h3>
 				<p class="cf-no-commenters-message bottom-xs-none">No filtered commenters available.</p>
-				<input class="cf-pied-search cf-search search bottom-xs-xxs" placeholder="Search pied commenters..." />
+				<input class="cf-filtered-search cf-search search bottom-xs-xxs" placeholder="Search filtered commenters..." />
 				<ul class="list cf-list cf-pied-list">
 					<li class="cf-list-item cf-pied-item">
 						<button class="cf-button cf-remove row middle-xs">
@@ -139,7 +137,7 @@ class Mai_Comment_Filter_Display {
 				</ul>
 			</div>
 			<div id="cf-settings-content" class="js-tabcontent">
-				<h3>Pie Settings</h3>
+				<h3>Settings</h3>
 				<form id="cf-settings-form" class="cf-settings-form" method="post">
 					<label><input type="radio" name="cf-display" value="default" checked> Hide Comment</label><br>
 					<label><input type="radio" name="cf-display" value="image"> Show a random image</label><br>
@@ -148,11 +146,6 @@ class Mai_Comment_Filter_Display {
 			</div>
 		</div>
 		<?php
-	}
-
-	function comment_number() {
-		printf( '<div class="comment-count" data-count="%1$s">%1$s.</div>', $this->count );
-		$this->count++;
 	}
 
 	function comment_attributes( $attributes ) {
@@ -200,6 +193,21 @@ class Mai_Comment_Filter_Display {
 
 }
 
-add_action( 'genesis_setup', function() {
-	new Mai_Comment_Filter_Display;
+// Get it started.
+add_action( 'wp', function() {
+	// Bail if not a single post/page/cpt.
+	if ( ! is_singular() ) {
+		return;
+	}
+	// Bail if comments are not open.
+	if ( ! comments_open( get_the_ID() ) ) {
+		return;
+	}
+	// Display.
+	maicf_display();
 });
+
+// Function to initiate the class.
+function maicf_display() {
+	new Mai_Comment_Filter_Display;
+}

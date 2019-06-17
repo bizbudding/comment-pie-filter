@@ -9,24 +9,24 @@ jQuery( function($) {
 		return;
 	}
 
-	// Bail if no comments.
-	var $commentsWrap = $( '#comments' );
-	if ( ! $commentsWrap.length ) {
+	var displaySetting     = '';
+	var filteredCommenters = [];
+	var imageCount         = commentFilterVars.images.length;
+	var quoteCount         = commentFilterVars.quotes.length;
+	var imageIndex         = 0;
+	var quoteIndex         = 0;
+	var $commentsWrap      = $( '#comments' );
+	var $respondWrap       = $( '#respond' );
+	var $commenterContent  = $( '#cf-commenter-content' );
+	var $filteredContent   = $( '#cf-filtered-content' );
+	var $settingsForm      = $( '#cf-settings-form' );
+
+	// Bail if no comment or reply elements.
+	if ( ! ( $commentsWrap.length || $respondWrap.length ) ) {
 		return;
 	}
 
-	var displaySetting    = '';
-	var piedCommenters    = [];
-	var imageCount        = commentFilterVars.images.length;
-	var quoteCount        = commentFilterVars.quotes.length;
-	var imageIndex        = 0;
-	var quoteIndex        = 0;
-	var $commenterContent = $( '#cf-commenter-content' );
-	var $piedContent      = $( '#cf-pied-content' );
-	var $settingsForm     = $( '#cf-settings-form' );
-	var commentUpIcon     = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 40" x="0px" y="0px" height="2em" width="2em" fill="currentColor"><title>comment-up</title><g data-name="comment-up"><path d="M28,3H4A2,2,0,0,0,2,5V23a2,2,0,0,0,2,2H6v3a1,1,0,0,0,.57.9A.91.91,0,0,0,7,29a1,1,0,0,0,.62-.22L12.35,25H28a2,2,0,0,0,2-2V5A2,2,0,0,0,28,3Zm0,20H12a1,1,0,0,0-.62.22L8,25.92V24a1,1,0,0,0-1-1H4V5H28Z"/><path d="M12.71,14.71,15,12.41V18a1,1,0,0,0,2,0V12.41l2.29,2.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42l-4-4a1,1,0,0,0-.33-.21,1,1,0,0,0-.76,0,1,1,0,0,0-.33.21l-4,4a1,1,0,0,0,1.42,1.42Z"/></g></svg>';
-	var commentDownIcon   = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 40" x="0px" y="0px" height="2em" width="2em" fill="currentColor"><title>comment-down</title><g data-name="comment-down"><path d="M28,3H4A2,2,0,0,0,2,5V23a2,2,0,0,0,2,2H6v3a1,1,0,0,0,.57.9A.91.91,0,0,0,7,29a1,1,0,0,0,.62-.22L12.35,25H28a2,2,0,0,0,2-2V5A2,2,0,0,0,28,3Zm0,20H12a1,1,0,0,0-.62.22L8,25.92V24a1,1,0,0,0-1-1H4V5H28Z"/><path d="M15.29,18.71a1,1,0,0,0,.33.21.94.94,0,0,0,.76,0,1,1,0,0,0,.33-.21l4-4a1,1,0,0,0-1.42-1.42L17,15.59V10a1,1,0,0,0-2,0v5.59l-2.29-2.3a1,1,0,0,0-1.42,1.42Z"/></g></svg>';
-
+	// Manage display setting.
 	localforage.getItem( 'commentFilterDisplay' ).then( function( value ) {
 		if ( ! value ) {
 			displaySetting = $settingsForm.find( 'input[name="cf-display"]:checked' ).val();
@@ -38,7 +38,7 @@ jQuery( function($) {
 		}
 	});
 
-	// Update setting on change.
+	// Update display setting on change.
 	$settingsForm.on( 'change', '[name="cf-display"]', function(e) {
 		// Save setting variable.
 		displaySetting = this.value;
@@ -56,34 +56,34 @@ jQuery( function($) {
 		});
 	});
 
-	// Loop through piedCommenters.
-	localforage.getItem( 'piedCommenters' ).then( function( value ) {
+	// Get filteredCommenters.
+	localforage.getItem( 'filteredCommenters' ).then( function( value ) {
 
-		// Maybe get existing pied users.
-		piedCommenters = value ? value : piedCommenters;
+		// Maybe get existing filtered commenters.
+		filteredCommenters = value ? value : filteredCommenters;
 
 		// Enable ListJS on commenter list.
 		var commenterList = new List( 'cf-commenter-content', {
 			valueNames: [ 'cf-commenter' ],
 		});
 
-		// Enable ListJS on pied list.
-		var piedList = new List( 'cf-pied-content', {
+		// Enable ListJS on filtered list.
+		var filteredList = new List( 'cf-filtered-content', {
 			valueNames: [ 'cf-commenter' ],
 		});
 
 		// Remove our first default row. It's only there so ListJS can have access to clone it via add().
 		commenterList.remove( 'cf-commenter', '' );
-		piedList.remove( 'cf-commenter', '' );
+		filteredList.remove( 'cf-commenter', '' );
 
-		// If we have pied commenters already on initial page load.
-		if ( piedCommenters && piedCommenters.length ) {
-			// Loop through pied users.
-			for ( var i = 0; i < piedCommenters.length; i++ ) {
-				// Remove existing pied users from commenter list.
-				commenterList.remove( 'cf-commenter', piedCommenters[i] );
-				piedList.add({ 'cf-commenter': piedCommenters[i] });
-				hideComments( piedCommenters[i] );
+		// If we have filtered commenters already on initial page load.
+		if ( filteredCommenters && filteredCommenters.length ) {
+			// Loop through filtered commenters.
+			for ( var i = 0; i < filteredCommenters.length; i++ ) {
+				// Remove existing filtered commenters from commenter list.
+				commenterList.remove( 'cf-commenter', filteredCommenters[i] );
+				filteredList.add({ 'cf-commenter': filteredCommenters[i] });
+				hideComments( filteredCommenters[i] );
 			}
 		}
 
@@ -125,13 +125,13 @@ jQuery( function($) {
 
 		function filterThisCommenter( commenter ) {
 			// Add new user to our array.
-			piedCommenters.push( commenter );
+			filteredCommenters.push( commenter );
 			// Make the array unique.
-			piedCommenters = piedCommenters.filter( makeUnique );
+			filteredCommenters = filteredCommenters.filter( makeUnique );
 			// Save the new array in storage.
-			localforage.setItem( 'piedCommenters', piedCommenters );
-			// Add to pied user list.
-			piedList.add({ 'cf-commenter': commenter });
+			localforage.setItem( 'filteredCommenters', filteredCommenters );
+			// Add to filtered user list.
+			filteredList.add({ 'cf-commenter': commenter });
 			// Remove from commenter list.
 			commenterList.remove( 'cf-commenter', commenter );
 			// Hide comments.
@@ -142,17 +142,17 @@ jQuery( function($) {
 
 		function unfilterThisCommenter( commenter ) {
 			// Get the index of the clicked item.
-			var index = piedCommenters.indexOf( commenter );
+			var index = filteredCommenters.indexOf( commenter );
 			// Bail if it's not a valid item.
 			if ( -1 === index ) {
 				return;
 			}
 			// Remove the item.
-			piedCommenters.splice( index, 1 );
+			filteredCommenters.splice( index, 1 );
 			// Save the new array in storage.
-			localforage.setItem( 'piedCommenters', piedCommenters );
-			// Remove from the pied list.
-			piedList.remove( 'cf-commenter', commenter );
+			localforage.setItem( 'filteredCommenters', filteredCommenters );
+			// Remove from the filtered list.
+			filteredList.remove( 'cf-commenter', commenter );
 			// If commenter exists on the page.
 			var $inner = $( '.cf-comment-inner[data-name="' + commenter + '"]' );
 			if ( $inner.length ) {
@@ -240,8 +240,8 @@ jQuery( function($) {
 			// Escape.
 			commenter = getEscaped( commenter );
 			// Get the index of the clicked item.
-			var index = piedCommenters.indexOf( commenter );
-			// Bail if commenter is also pied.
+			var index = filteredCommenters.indexOf( commenter );
+			// Bail if commenter is also filtered.
 			if ( -1 !== index ) {
 				return;
 			}
@@ -301,13 +301,13 @@ jQuery( function($) {
 				$commenterContent.addClass( 'cf-no-commenters' );
 			}
 
-			// If pied commenters in the list and has no-pied-commenters class.
-			if ( bool( piedList.visibleItems.length && $piedContent.hasClass( 'cf-no-commenters' ) ) ) {
-				$piedContent.removeClass( 'cf-no-commenters' );
+			// If filtered commenters in the list and has no-filtered-commenters class.
+			if ( bool( filteredList.visibleItems.length && $filteredContent.hasClass( 'cf-no-commenters' ) ) ) {
+				$filteredContent.removeClass( 'cf-no-commenters' );
 			}
-			// If no pied commenters in the list and doesn't have no-pied-commenters class.
-			else if ( ! bool( piedList.visibleItems.length ) && ! bool( $piedContent.hasClass( 'cf-no-commenters' ) ) ) {
-				$piedContent.addClass( 'cf-no-commenters' );
+			// If no filtered commenters in the list and doesn't have no-filtered-commenters class.
+			else if ( ! bool( filteredList.visibleItems.length ) && ! bool( $filteredContent.hasClass( 'cf-no-commenters' ) ) ) {
+				$filteredContent.addClass( 'cf-no-commenters' );
 			}
 		}
 	});
@@ -328,7 +328,6 @@ jQuery( function($) {
 					if ( quoteIndex === quoteCount ) {
 						quoteIndex = 0;
 					}
-					console.log( quoteIndex );
 					$cfContent.html( '<p>' + commentFilterVars.quotes[ quoteIndex ] + '</p>' );
 					quoteIndex++;
 					break;

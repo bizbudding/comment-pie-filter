@@ -170,7 +170,7 @@ final class Mai_Comment_Pie_Filter {
 		}
 
 		// Setup the updater.
-		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/maithemewp/comment-filter/', __FILE__, 'mai-comment-filter' );
+		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/maithemewp/mai-comment-filter/', __FILE__, 'mai-comment-filter' );
 	}
 
 }

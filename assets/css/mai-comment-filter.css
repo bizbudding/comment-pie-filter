@@ -99,9 +99,9 @@
 }
 
 .cf-commenter-list,
-.cf-pied-list,
+.cf-filtered-list,
 .content ul.cf-commenter-list,
-.content ul.cf-pied-list {
+.content ul.cf-filtered-list {
 	max-height: 300px;
 	list-style-type: none;
 	padding: 0;
