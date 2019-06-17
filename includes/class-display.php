@@ -195,6 +195,10 @@ class Mai_Comment_Filter_Display {
 
 // Get it started.
 add_action( 'wp', function() {
+	// Bail if not running Genesis.
+	if ( 'genesis' !== wp_get_theme()->template ) {
+		return;
+	}
 	// Bail if not a single post/page/cpt.
 	if ( ! is_singular() ) {
 		return;
