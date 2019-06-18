@@ -94,7 +94,7 @@ jQuery( function($) {
 		$( '.cf-list' ).on( 'click', '.cf-button', function(e) {
 
 			// Get the commenter name.
-			var commenter = $(this).children( '.cf-commenter' ).html();
+			var commenter = $(this).children( '.cf-commenter' ).text();
 
 			// Escape.
 			commenter = getEscaped( commenter );
