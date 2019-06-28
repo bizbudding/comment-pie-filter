@@ -17,9 +17,12 @@ jQuery( function($) {
 	var quoteIndex         = 0;
 	var $commentsWrap      = $( '#comments' );
 	var $respondWrap       = $( '#respond' );
+	var $commenterList     = $( '#jetsCommenterList' );
+	var $filteredList      = $( '#jetsFilteredList' );
 	var $commenterContent  = $( '#cf-commenter-content' );
 	var $filteredContent   = $( '#cf-filtered-content' );
 	var $settingsForm      = $( '#cf-settings-form' );
+
 
 	// Bail if no comment or reply elements.
 	if ( ! ( $commentsWrap.length || $respondWrap.length ) ) {
@@ -62,28 +65,21 @@ jQuery( function($) {
 		// Maybe get existing filtered commenters.
 		filteredCommenters = value ? value : filteredCommenters;
 
-		// Enable ListJS on commenter list.
-		var commenterList = new List( 'cf-commenter-content', {
-			valueNames: [ 'cf-commenter' ],
+		var commenterList = new Jets({
+			searchTag: '#jetsCommenterSearch',
+			contentTag: '#jetsCommenterList',
 		});
 
-		// Enable ListJS on filtered list.
-		var filteredList = new List( 'cf-filtered-content', {
-			valueNames: [ 'cf-commenter' ],
+		var filteredList = new Jets({
+			searchTag: '#jetsFilteredSearch',
+			contentTag: '#jetsFilteredList',
 		});
-
-		// Remove our first default row. It's only there so ListJS can have access to clone it via add().
-		commenterList.remove( 'cf-commenter', '' );
-		filteredList.remove( 'cf-commenter', '' );
 
 		// If we have filtered commenters already on initial page load.
 		if ( filteredCommenters && filteredCommenters.length ) {
 			// Loop through filtered commenters.
 			for ( var i = 0; i < filteredCommenters.length; i++ ) {
-				// Remove existing filtered commenters from commenter list.
-				commenterList.remove( 'cf-commenter', filteredCommenters[i] );
-				filteredList.add({ 'cf-commenter': filteredCommenters[i] });
-				hideComments( filteredCommenters[i] );
+				filterThisCommenter( filteredCommenters[i] );
 			}
 		}
 
@@ -91,13 +87,10 @@ jQuery( function($) {
 		doEmptyLists();
 
 		// Filter/Unfilter commenter.
-		$( '.cf-list' ).on( 'click', '.cf-button', function(e) {
+		$( '.cf-list' ).on( 'click', '.cf-list-item', function(e) {
 
 			// Get the commenter name.
-			var commenter = $(this).children( '.cf-commenter' ).text();
-
-			// TODO: Fixe issues with ampersand/etc here.
-			// https://github.com/javve/list.js/issues/147
+			var commenter = $(this).text();
 
 			// Bail if no value.
 			if ( ! commenter.length ) {
@@ -105,11 +98,11 @@ jQuery( function($) {
 			}
 
 			// If adding.
-			if ( $(this).hasClass( 'cf-add' ) ) {
+			if ( $(this).hasClass( 'cfAdd' ) ) {
 				filterThisCommenter( commenter );
 			}
 			// If removing.
-			else if ( $(this).hasClass( 'cf-remove' ) ) {
+			else if ( $(this).hasClass( 'cfRemove' ) ) {
 				unfilterThisCommenter( commenter );
 			}
 		});
@@ -130,10 +123,13 @@ jQuery( function($) {
 			filteredCommenters = filteredCommenters.filter( makeUnique );
 			// Save the new array in storage.
 			localforage.setItem( 'filteredCommenters', filteredCommenters );
-			// Add to filtered user list.
-			filteredList.add({ 'cf-commenter': commenter });
-			// Remove from commenter list.
-			commenterList.remove( 'cf-commenter', commenter );
+			// Add them to the filtered list.
+			$filteredList.append( '<li class="cf-list-item cf-commenter-item cfRemove" data-action="' + commentFilterVars.textRemove + '">' + commenter + '</li>' );
+			// Remove existing filtered commenters from commenter list.
+			$commenterList.find( 'li[data-jets="' + commenter.toLowerCase() + '"]' ).remove();
+			// Update Jets.
+			filteredList.update();
+			commenterList.update();
 			// Hide comments.
 			hideComments( commenter );
 			// Check for for empty lists.
@@ -152,13 +148,16 @@ jQuery( function($) {
 			// Save the new array in storage.
 			localforage.setItem( 'filteredCommenters', filteredCommenters );
 			// Remove from the filtered list.
-			filteredList.remove( 'cf-commenter', commenter );
+			$filteredList.find( 'li[data-jets="' + commenter.toLowerCase() + '"]' ).remove();
 			// If commenter exists on the page.
 			var $inner = $( '.cf-comment-inner[data-name="' + commenter + '"]' );
 			if ( $inner.length ) {
 				// Add to user back to commenter list.
-				commenterList.add({ 'cf-commenter': commenter });
+				$commenterList.append( '<li class="cf-list-item cf-commenter-item cfAdd" data-action="' + commentFilterVars.textAdd + '">' + commenter + '</li>' );
 			}
+			// Update Jets.
+			filteredList.update();
+			commenterList.update();
 			// Show comments.
 			showComments( commenter );
 			// Check for for empty lists.
@@ -290,21 +289,23 @@ jQuery( function($) {
 		}
 
 		function doEmptyLists() {
+			var commenterItems = $commenterList.find( 'li' ).length;
+			var filteredItems  = $filteredList.find( 'li' ).length;
 			// If commenters in the list and has the no-commenters class.
-			if ( bool( commenterList.visibleItems.length && $commenterContent.hasClass( 'cf-no-commenters' ) ) ) {
+			if ( bool( commenterItems && $commenterContent.hasClass( 'cf-no-commenters' ) ) ) {
 				$commenterContent.removeClass( 'cf-no-commenters' );
 			}
 			// If no commenters in the list and doesn't have no-commenters class.
-			else if ( ! bool( commenterList.visibleItems.length ) && ! bool( $commenterContent.hasClass( 'cf-no-commenters' ) ) ) {
+			else if ( ! bool( commenterItems ) && ! bool( $commenterContent.hasClass( 'cf-no-commenters' ) ) ) {
 				$commenterContent.addClass( 'cf-no-commenters' );
 			}
 
 			// If filtered commenters in the list and has no-filtered-commenters class.
-			if ( bool( filteredList.visibleItems.length && $filteredContent.hasClass( 'cf-no-commenters' ) ) ) {
+			if ( bool( filteredItems && $filteredContent.hasClass( 'cf-no-commenters' ) ) ) {
 				$filteredContent.removeClass( 'cf-no-commenters' );
 			}
 			// If no filtered commenters in the list and doesn't have no-filtered-commenters class.
-			else if ( ! bool( filteredList.visibleItems.length ) && ! bool( $filteredContent.hasClass( 'cf-no-commenters' ) ) ) {
+			else if ( ! bool( filteredItems ) && ! bool( $filteredContent.hasClass( 'cf-no-commenters' ) ) ) {
 				$filteredContent.addClass( 'cf-no-commenters' );
 			}
 		}

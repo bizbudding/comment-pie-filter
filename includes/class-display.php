@@ -18,12 +18,14 @@ class Mai_Comment_Filter_Display {
 		$suffix = $this->get_suffix();
 		wp_enqueue_style( 'mai-comment-filter',      MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/css/mai-comment-filter{$suffix}.css", array(), MAI_COMMENT_PIE_FILTER_VERSION );
 		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs.min.js", array( 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
-		wp_enqueue_script( 'list-js',                MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/list.min.js", array( 'jquery' ), '1.5.0', true );
+		wp_enqueue_script( 'jets-js',                MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jets{$suffix}.js", array( 'jquery' ), '0.14.1', true );
 		wp_enqueue_script( 'localforage',            MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/localforage.min.js", array( 'jquery' ), '1.7.3', true );
-		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'localforage', 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
+		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'jets-js', 'localforage', 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
 		wp_localize_script( 'mai-comment-filter',    'commentFilterVars', array(
-			'images' => $this->get_images(),
-			'quotes' => $this->get_quotes(),
+			'images'     => $this->get_images(),
+			'quotes'     => $this->get_quotes(),
+			'textAdd'    => $this->get_add_text(),
+			'textRemove' => $this->get_remove_text(),
 		) );
 	}
 
@@ -37,6 +39,14 @@ class Mai_Comment_Filter_Display {
 	function get_suffix() {
 		$debug = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 		return $debug ? '' : '.min';
+	}
+
+	function get_add_text() {
+		return __( 'Click to Add', 'mai-comment-filter' );
+	}
+
+	function get_remove_text() {
+		return __( 'Click to Remove', 'mai-comment-filter' );
 	}
 
 	function get_images() {
@@ -96,29 +106,13 @@ class Mai_Comment_Filter_Display {
 				?>
 				<h3>Commenters</h3>
 				<p class="cf-no-commenters-message bottom-xs-none">No commenters available.</p>
-				<input class="cf-commenter-search cf-search search bottom-xs-xxs" placeholder="Search commenters..." />
-				<ul class="list cf-list cf-commenter-list">
+				<input id="jetsCommenterSearch" class="cf-commenter-search cf-search search bottom-xs-xxs" placeholder="Search commenters..." />
+				<ul id="jetsCommenterList" class="list cf-list cf-commenter-list">
 					<?php
 					if ( $commenters ) {
 						foreach( $commenters as $commenter ) {
-							?>
-							<li class="cf-list-item cf-commenter-item">
-								<button class="cf-button cf-add row middle-xs">
-									<?php printf( '<span class="cf-commenter col col-xs text-xs-left">%s</span>', $commenter ); ?>
-									<span class="action col-xs-auto">Click to Add</span>
-								</button>
-							</li>
-							<?php
+							printf( '<li class="cf-list-item cf-commenter-item cfAdd" data-action="%s">%s</li>', $this->get_add_text(), $commenter );
 						}
-					} else {
-						?>
-						<li class="cf-list-item cf-commenter-item">
-							<button class="cf-button cf-add row middle-xs">
-								<span class="cf-commenter col col-xs text-xs-left"></span>
-								<span class="action col-xs-auto">Click to Add</span>
-							</button>
-						</li>
-						<?php
 					}
 					?>
 				</ul>
@@ -126,15 +120,8 @@ class Mai_Comment_Filter_Display {
 			<div id="cf-filtered-content" class="js-tabcontent">
 				<h3>Filtered Commenters</h3>
 				<p class="cf-no-commenters-message bottom-xs-none">No filtered commenters available.</p>
-				<input class="cf-filtered-search cf-search search bottom-xs-xxs" placeholder="Search filtered commenters..." />
-				<ul class="list cf-list cf-pied-list">
-					<li class="cf-list-item cf-pied-item">
-						<button class="cf-button cf-remove row middle-xs">
-							<span class="cf-commenter col col-xs text-xs-left"></span>
-							<span class="action col-xs-auto">Click to Remove</span>
-						</button>
-					</li>
-				</ul>
+				<input id="jetsFilteredSearch" class="cf-filtered-search cf-search search bottom-xs-xxs" placeholder="Search filtered commenters..." />
+				<ul id="jetsFilteredList" class="list cf-list cf-pied-list"></ul>
 			</div>
 			<div id="cf-settings-content" class="js-tabcontent">
 				<h3>Settings</h3>
