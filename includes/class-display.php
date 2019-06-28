@@ -17,9 +17,9 @@ class Mai_Comment_Filter_Display {
 	function enqueue() {
 		$suffix = $this->get_suffix();
 		wp_enqueue_style( 'mai-comment-filter',      MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/css/mai-comment-filter{$suffix}.css", array(), MAI_COMMENT_PIE_FILTER_VERSION );
-		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs{$suffix}.js", array( 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
-		wp_enqueue_script( 'list-js',                MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/list{$suffix}.js", array( 'jquery' ), '1.5.0', true );
-		wp_enqueue_script( 'localforage',            MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/localforage{$suffix}.js", array( 'jquery' ), '1.7.3', true );
+		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs.min.js", array( 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
+		wp_enqueue_script( 'list-js',                MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/list.min.js", array( 'jquery' ), '1.5.0', true );
+		wp_enqueue_script( 'localforage',            MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/localforage.min.js", array( 'jquery' ), '1.7.3', true );
 		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'localforage', 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
 		wp_localize_script( 'mai-comment-filter',    'commentFilterVars', array(
 			'images' => $this->get_images(),

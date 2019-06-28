@@ -96,8 +96,8 @@ jQuery( function($) {
 			// Get the commenter name.
 			var commenter = $(this).children( '.cf-commenter' ).text();
 
-			// Escape.
-			commenter = getEscaped( commenter );
+			// TODO: Fixe issues with ampersand/etc here.
+			// https://github.com/javve/list.js/issues/147
 
 			// Bail if no value.
 			if ( ! commenter.length ) {
@@ -237,8 +237,6 @@ jQuery( function($) {
 			}
 			// Get the commenter name.
 			var commenter = $replies.data( 'name' );
-			// Escape.
-			commenter = getEscaped( commenter );
 			// Get the index of the clicked item.
 			var index = filteredCommenters.indexOf( commenter );
 			// Bail if commenter is also filtered.
@@ -335,12 +333,6 @@ jQuery( function($) {
 					$cfContent.html( '' );
 			}
 		});
-	}
-
-	function getEscaped( string ) {
-		var div = document.createElement( 'div' );
-		div.appendChild( document.createTextNode( string ) );
-		return div.innerHTML;
 	}
 
 	/**
