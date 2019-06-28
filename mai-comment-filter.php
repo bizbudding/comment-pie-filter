@@ -4,7 +4,7 @@
  * Plugin Name:     Mai Comment Filter
  * Plugin URI:      https://bizbudding.com
  * Description:     Core funtionality for bizbudding.com
- * Version:         0.1.1
+ * Version:         0.2.0
  *
  * Author:          BizBudding, Mike Hemberger
  * Author URI:      https://bizbudding.com
@@ -90,7 +90,7 @@ final class Mai_Comment_Pie_Filter {
 
 		// Plugin version.
 		if ( ! defined( 'MAI_COMMENT_PIE_FILTER_VERSION' ) ) {
-			define( 'MAI_COMMENT_PIE_FILTER_VERSION', '0.1.1' );
+			define( 'MAI_COMMENT_PIE_FILTER_VERSION', '0.2.0' );
 		}
 
 		// Plugin Folder Path.
