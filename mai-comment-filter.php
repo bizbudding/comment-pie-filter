@@ -4,7 +4,7 @@
  * Plugin Name:     Mai Comment Filter
  * Plugin URI:      https://bizbudding.com
  * Description:     Core funtionality for bizbudding.com
- * Version:         0.2.1
+ * Version:         0.3.0
  *
  * Author:          BizBudding, Mike Hemberger
  * Author URI:      https://bizbudding.com
@@ -90,7 +90,7 @@ final class Mai_Comment_Filter {
 
 		// Plugin version.
 		if ( ! defined( 'MAI_COMMENT_FILTER_VERSION' ) ) {
-			define( 'MAI_COMMENT_FILTER_VERSION', '0.2.1' );
+			define( 'MAI_COMMENT_FILTER_VERSION', '0.3.0' );
 		}
 
 		// Plugin Folder Path.
@@ -173,7 +173,14 @@ final class Mai_Comment_Filter {
 		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/maithemewp/mai-comment-filter/', __FILE__, 'mai-comment-filter' );
 	}
 
-	public function get_settings_options() {
+	/**
+	 * Get the default setting options.
+	 *
+	 * @since   0.3.0
+	 *
+	 * @return  array  The settings options.
+	 */
+	public function get_setting_options() {
 		return array(
 			'hide'  => 'Hide comment',
 			'image' => 'Show a random image',
