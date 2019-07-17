@@ -34,7 +34,7 @@ class Mai_Comment_Filter_Settings {
 	}
 
 	function load_options( $field ) {
-		$field['choices'] = mai_comment_filter()->get_settings_options();
+		$field['choices'] = mai_comment_filter()->get_setting_options();
 		$field['default'] = 'hide';
 		return $field;
 	}

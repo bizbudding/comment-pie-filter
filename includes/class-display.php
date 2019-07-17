@@ -136,8 +136,8 @@ class Mai_Comment_Filter_Display {
 				<h3>Settings</h3>
 				<form id="cf-settings-form" class="cf-settings-form" method="post">
 					<?php
-					$settings = mai_comment_filter()->get_settings_options();
-					foreach ( mai_comment_filter()->get_settings_options() as $value => $label ) {
+					$settings = mai_comment_filter()->get_setting_options();
+					foreach ( mai_comment_filter()->get_setting_options() as $value => $label ) {
 						$checked = ( $value === $this->get_default_setting() ) ? ' checked' : '';
 						printf( '<label><input type="radio" name="cf-display" value="%s"%s> %s</label><br>', $value, $checked, $label );
 					}
