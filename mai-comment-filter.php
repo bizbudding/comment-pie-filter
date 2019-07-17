@@ -14,36 +14,36 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Main Mai_Comment_Pie_Filter Class.
+ * Main Mai_Comment_Filter Class.
  *
  * @since 0.1.0
  */
-final class Mai_Comment_Pie_Filter {
+final class Mai_Comment_Filter {
 
 	/**
-	 * @var   Mai_Comment_Pie_Filter The one true Mai_Comment_Pie_Filter
+	 * @var   Mai_Comment_Filter The one true Mai_Comment_Filter
 	 * @since 0.1.0
 	 */
 	private static $instance;
 
 	/**
-	 * Main Mai_Comment_Pie_Filter Instance.
+	 * Main Mai_Comment_Filter Instance.
 	 *
-	 * Insures that only one instance of Mai_Comment_Pie_Filter exists in memory at any one
+	 * Insures that only one instance of Mai_Comment_Filter exists in memory at any one
 	 * time. Also prevents needing to define globals all over the place.
 	 *
 	 * @since   0.1.0
 	 * @static  var array $instance
-	 * @uses    Mai_Comment_Pie_Filter::setup_constants() Setup the constants needed.
-	 * @uses    Mai_Comment_Pie_Filter::includes() Include the required files.
-	 * @uses    Mai_Comment_Pie_Filter::hooks() Activate, deactivate, etc.
-	 * @see     Mai_Comment_Pie_Filter()
-	 * @return  object | Mai_Comment_Pie_Filter The one true Mai_Comment_Pie_Filter
+	 * @uses    Mai_Comment_Filter::setup_constants() Setup the constants needed.
+	 * @uses    Mai_Comment_Filter::includes() Include the required files.
+	 * @uses    Mai_Comment_Filter::hooks() Activate, deactivate, etc.
+	 * @see     Mai_Comment_Filter()
+	 * @return  object | Mai_Comment_Filter The one true Mai_Comment_Filter
 	 */
 	public static function instance() {
 		if ( ! isset( self::$instance ) ) {
 			// Setup the setup
-			self::$instance = new Mai_Comment_Pie_Filter;
+			self::$instance = new Mai_Comment_Filter;
 			// Methods
 			self::$instance->setup_constants();
 			self::$instance->includes();
@@ -89,33 +89,33 @@ final class Mai_Comment_Pie_Filter {
 	private function setup_constants() {
 
 		// Plugin version.
-		if ( ! defined( 'MAI_COMMENT_PIE_FILTER_VERSION' ) ) {
-			define( 'MAI_COMMENT_PIE_FILTER_VERSION', '0.2.1' );
+		if ( ! defined( 'MAI_COMMENT_FILTER_VERSION' ) ) {
+			define( 'MAI_COMMENT_FILTER_VERSION', '0.2.1' );
 		}
 
 		// Plugin Folder Path.
-		if ( ! defined( 'MAI_COMMENT_PIE_FILTER_PLUGIN_DIR' ) ) {
-			define( 'MAI_COMMENT_PIE_FILTER_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+		if ( ! defined( 'MAI_COMMENT_FILTER_PLUGIN_DIR' ) ) {
+			define( 'MAI_COMMENT_FILTER_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 		}
 
 		// Plugin Includes Path.
-		if ( ! defined( 'MAI_COMMENT_PIE_FILTER_INCLUDES_DIR' ) ) {
-			define( 'MAI_COMMENT_PIE_FILTER_INCLUDES_DIR', MAI_COMMENT_PIE_FILTER_PLUGIN_DIR . 'includes/' );
+		if ( ! defined( 'MAI_COMMENT_FILTER_INCLUDES_DIR' ) ) {
+			define( 'MAI_COMMENT_FILTER_INCLUDES_DIR', MAI_COMMENT_FILTER_PLUGIN_DIR . 'includes/' );
 		}
 
 		// Plugin Folder URL.
-		if ( ! defined( 'MAI_COMMENT_PIE_FILTER_PLUGIN_URL' ) ) {
-			define( 'MAI_COMMENT_PIE_FILTER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		if ( ! defined( 'MAI_COMMENT_FILTER_PLUGIN_URL' ) ) {
+			define( 'MAI_COMMENT_FILTER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 		}
 
 		// Plugin Root File.
-		if ( ! defined( 'MAI_COMMENT_PIE_FILTER_PLUGIN_FILE' ) ) {
-			define( 'MAI_COMMENT_PIE_FILTER_PLUGIN_FILE', __FILE__ );
+		if ( ! defined( 'MAI_COMMENT_FILTER_PLUGIN_FILE' ) ) {
+			define( 'MAI_COMMENT_FILTER_PLUGIN_FILE', __FILE__ );
 		}
 
-		// Plugin Base Name
-		if ( ! defined( 'MAI_COMMENT_PIE_FILTER_BASENAME' ) ) {
-			define( 'MAI_COMMENT_PIE_FILTER_BASENAME', dirname( plugin_basename( __FILE__ ) ) );
+		// Plugin Base Name.
+		if ( ! defined( 'MAI_COMMENT_FILTER_BASENAME' ) ) {
+			define( 'MAI_COMMENT_FILTER_BASENAME', dirname( plugin_basename( __FILE__ ) ) );
 		}
 
 	}
@@ -131,7 +131,7 @@ final class Mai_Comment_Pie_Filter {
 		// Include vendor libraries.
 		require_once __DIR__ . '/vendor/autoload.php';
 		// Includes.
-		foreach ( glob( MAI_COMMENT_PIE_FILTER_INCLUDES_DIR . '*.php' ) as $file ) { include $file; }
+		foreach ( glob( MAI_COMMENT_FILTER_INCLUDES_DIR . '*.php' ) as $file ) { include $file; }
 	}
 
 	/**
@@ -173,26 +173,34 @@ final class Mai_Comment_Pie_Filter {
 		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/maithemewp/mai-comment-filter/', __FILE__, 'mai-comment-filter' );
 	}
 
+	public function get_settings_options() {
+		return array(
+			'hide'  => 'Hide comment',
+			'image' => 'Show a random image',
+			'quote' => 'Show a random quote',
+		);
+	}
+
 }
 
 /**
- * The main function for that returns Mai_Comment_Pie_Filter
+ * The main function for that returns Mai_Comment_Filter
  *
- * The main function responsible for returning the one true Mai_Comment_Pie_Filter
+ * The main function responsible for returning the one true Mai_Comment_Filter
  * Instance to functions everywhere.
  *
  * Use this function like you would a global variable, except without needing
  * to declare the global.
  *
- * Example: <?php $plugin = Mai_Comment_Pie_Filter(); ?>
+ * Example: <?php $plugin = mai_comment_filter(); ?>
  *
  * @since 0.1.0
  *
- * @return object|Mai_Comment_Pie_Filter The one true Mai_Comment_Pie_Filter Instance.
+ * @return object|Mai_Comment_Filter The one true Mai_Comment_Filter Instance.
  */
-function Mai_Comment_Pie_Filter() {
-	return Mai_Comment_Pie_Filter::instance();
+function mai_comment_filter() {
+	return Mai_Comment_Filter::instance();
 }
 
-// Get Mai_Comment_Pie_Filter Running.
-Mai_Comment_Pie_Filter();
+// Get Mai_Comment_Filter Running.
+mai_comment_filter();

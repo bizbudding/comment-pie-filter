@@ -10,17 +10,17 @@ class Mai_Comment_Filter_Display {
 
 	function hooks() {
 		add_action( 'wp_enqueue_scripts',      array( $this, 'enqueue' ) );
-		add_action( 'genesis_before_comments', array( $this, 'add_pie_filter' ) );
+		add_action( 'genesis_before_comments', array( $this, 'add_comment_filter' ) );
 		add_filter( 'genesis_attr_comment',    array( $this, 'comment_attributes' ) );
 	}
 
 	function enqueue() {
 		$suffix = $this->get_suffix();
-		wp_enqueue_style( 'mai-comment-filter',      MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/css/mai-comment-filter{$suffix}.css", array(), MAI_COMMENT_PIE_FILTER_VERSION );
-		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs.min.js", array( 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
-		wp_enqueue_script( 'jets-js',                MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/jets{$suffix}.js", array( 'jquery' ), '0.14.1', true );
-		wp_enqueue_script( 'localforage',            MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/localforage.min.js", array( 'jquery' ), '1.7.3', true );
-		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_PIE_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'jets-js', 'localforage', 'jquery' ), MAI_COMMENT_PIE_FILTER_VERSION, true );
+		wp_enqueue_style( 'mai-comment-filter',      MAI_COMMENT_FILTER_PLUGIN_URL . "assets/css/mai-comment-filter{$suffix}.css", array(), MAI_COMMENT_FILTER_VERSION );
+		wp_enqueue_script( 'jquery-accessible-tabs', MAI_COMMENT_FILTER_PLUGIN_URL . "assets/js/jquery-accessible-tabs.min.js", array( 'jquery' ), MAI_COMMENT_FILTER_VERSION, true );
+		wp_enqueue_script( 'jets-js',                MAI_COMMENT_FILTER_PLUGIN_URL . "assets/js/jets{$suffix}.js", array( 'jquery' ), '0.14.1', true );
+		wp_enqueue_script( 'localforage',            MAI_COMMENT_FILTER_PLUGIN_URL . "assets/js/localforage.min.js", array( 'jquery' ), '1.7.3', true );
+		wp_enqueue_script( 'mai-comment-filter',     MAI_COMMENT_FILTER_PLUGIN_URL . "assets/js/mai-comment-filter{$suffix}.js", array( 'jets-js', 'localforage', 'jquery' ), MAI_COMMENT_FILTER_VERSION, true );
 		wp_localize_script( 'mai-comment-filter',    'commentFilterVars', array(
 			'images'     => $this->get_images(),
 			'quotes'     => $this->get_quotes(),
@@ -85,9 +85,18 @@ class Mai_Comment_Filter_Display {
 		return $quotes;
 	}
 
-	function add_pie_filter() {
+	function get_default_setting() {
+		$default = 'hide';
+		if ( ! function_exists( 'get_field' ) ) {
+			return $default;
+		}
+		$setting = get_field( 'comment_filter_default_setting', 'option' );
+		return $setting ? $setting : $default;
+	}
+
+	function add_comment_filter() {
 		?>
-		<div class="pie-filter js-tabs" data-tabs-disable-fragment="1">
+		<div class="cf-filter js-tabs" data-tabs-disable-fragment="1">
 			<ul class="js-tablist">
 				<li class="js-tablist__item">
 					<a href="#cf-commenter-content" class="js-tablist__link">Commenters</a>
@@ -126,9 +135,13 @@ class Mai_Comment_Filter_Display {
 			<div id="cf-settings-content" class="js-tabcontent">
 				<h3>Settings</h3>
 				<form id="cf-settings-form" class="cf-settings-form" method="post">
-					<label><input type="radio" name="cf-display" value="default" checked> Hide Comment</label><br>
-					<label><input type="radio" name="cf-display" value="image"> Show a random image</label><br>
-					<label><input type="radio" name="cf-display" value="quote"> Show a random quote</label>
+					<?php
+					$settings = mai_comment_filter()->get_settings_options();
+					foreach ( mai_comment_filter()->get_settings_options() as $value => $label ) {
+						$checked = ( $value === $this->get_default_setting() ) ? ' checked' : '';
+						printf( '<label><input type="radio" name="cf-display" value="%s"%s> %s</label><br>', $value, $checked, $label );
+					}
+					?>
 				</form>
 			</div>
 		</div>
