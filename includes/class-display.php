@@ -174,6 +174,8 @@ class Mai_Comment_Filter_Display {
 		$comments = get_comments( array(
 			'post_id' => get_the_ID(),
 			'status'  => 'approve',
+			'orderby' => 'comment_author',
+			'order'   => 'ASC',
 		) );
 		// Bail if no comments.
 		if ( ! $comments ) {
