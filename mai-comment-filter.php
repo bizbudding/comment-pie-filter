@@ -141,11 +141,7 @@ final class Mai_Comment_Filter {
 	 * @return  void
 	 */
 	public function hooks() {
-
 		add_action( 'admin_init', array( $this, 'updater' ) );
-
-		register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
 	}
 
 	/**
