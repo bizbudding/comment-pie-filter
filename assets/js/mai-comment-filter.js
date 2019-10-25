@@ -131,7 +131,7 @@ jQuery( function($) {
 			filteredList.update();
 			commenterList.update();
 			// Hide comments.
-			hideComments( commenter );
+			hideCommentsAndReplies( commenter );
 			// Check for for empty lists.
 			doEmptyLists();
 		}
@@ -159,35 +159,26 @@ jQuery( function($) {
 			filteredList.update();
 			commenterList.update();
 			// Show comments.
-			showComments( commenter );
+			showCommentsAndReplies( commenter );
 			// Check for for empty lists.
 			doEmptyLists();
 		}
 
-		function hideComments( commenter ) {
-			var $comment = getComment( commenter );
-			if ( ! $comment.length ) {
+		function hideCommentsAndReplies( commenter ) {
+			var $comments = getComments( commenter );
+			if ( ! $comments.length ) {
 				return;
 			}
-			hideComment( $comment );
-			hideReplies( $comment );
+			hideComments( $comments );
+			$.each( $comments, function( index, value ) {
+				hideReplies( $(this) );
+			});
 		}
 
-		function hideReplies( $comment ) {
-			$replies = getReplies( $comment );
-			if ( ! $replies.length ) {
-				return;
-			}
-			hideComment( $replies );
-		}
-
-		function hideComment( $comment ) {
+		function hideComments( $comment ) {
 
 			// Loop through em. I was getting duplicates when the same user commented back to back.
 			$.each( $comment, function( index, value ) {
-
-				// Get the main wrap.
-				var $commentLi = $(this).parents( '.comment' );
 
 				// Bail if already hidden (this may be cause it's a reply to filtered comment).
 				if ( $(this).hasClass( 'cf-hidden' ) ) {
@@ -220,13 +211,21 @@ jQuery( function($) {
 			});
 		}
 
-		function showComments( commenter ) {
-			var $comment = getComment( commenter );
-			if ( ! $comment.length ) {
+		function hideReplies( $comment ) {
+			$replies = getReplies( $comment );
+			if ( ! $replies.length ) {
 				return;
 			}
-			showComment( $comment );
-			showReplies( $comment, commenter );
+			hideComments( $replies );
+		}
+
+		function showCommentsAndReplies( commenter ) {
+			var $comments = getComments( commenter );
+			if ( ! $comments.length ) {
+				return;
+			}
+			showComments( $comments );
+			showReplies( $comments, commenter );
 		}
 
 		function showReplies( $comment ) {
@@ -242,11 +241,11 @@ jQuery( function($) {
 			if ( -1 !== index ) {
 				return;
 			}
-			showComment( $replies );
+			showComments( $replies );
 		}
 
-		function showComment( $comment ) {
-			var $commentLi = $comment.parent( '.comment' );
+		function showComments( $comments ) {
+			var $commentLi = $comments.parent( '.comment' );
 			var $cfContent = $commentLi.find( '.cf-content' );
 			var $toggle    = $commentLi.find( '.cf-toggle' );
 			if ( $commentLi.length ) {
@@ -260,20 +259,20 @@ jQuery( function($) {
 			}
 		}
 
-		function getComment( commenter ) {
-			var $comment = $( '.cf-comment-inner[data-name="' + commenter + '"]' );
-			if ( ! $comment.length ) {
+		function getComments( commenter ) {
+			var $comments = $( '.cf-comment-inner[data-name="' + commenter + '"]' );
+			if ( ! $comments.length ) {
 				return {};
 			}
-			return $comment;
+			return $comments;
 		}
 
-		function getCommentContent( $comment ) {
-			var $content = $comment.find( '.comment-content' );
-			if ( ! $content.length ) {
+		function getCommentsContent( $comments ) {
+			var $contents = $comments.find( '.comment-content' );
+			if ( ! $contents.length ) {
 				return {};
 			}
-			return $content;
+			return $contents;
 		}
 
 		function getReplies( $comment ) {
