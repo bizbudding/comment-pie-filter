@@ -144,6 +144,7 @@ class Mai_Comment_Filter_Display {
 					?>
 				</form>
 			</div>
+			<?php do_action( 'maicf_after_filter' ); ?>
 		</div>
 		<?php
 	}
