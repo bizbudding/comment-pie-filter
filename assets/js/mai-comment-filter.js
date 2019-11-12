@@ -225,7 +225,9 @@ jQuery( function($) {
 				return;
 			}
 			showComments( $comments );
-			showReplies( $comments, commenter );
+			$.each( $comments, function( index, value ) {
+				showReplies( $(this) );
+			});
 		}
 
 		function showReplies( $comment ) {
